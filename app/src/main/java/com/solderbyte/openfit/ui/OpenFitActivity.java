@@ -198,6 +198,7 @@ public class OpenFitActivity extends Activity {
         private static CheckBoxPreference preference_checkbox_sms;
         private static CheckBoxPreference preference_checkbox_time;
         private static CheckBoxPreference preference_checkbox_googlefit;
+        private static CheckBoxPreference preference_checkbox_media_control_alternative;
         private static ListPreference preference_list_weather;
         private static ListPreference preference_list_devices;
         private static Preference preference_scan;
@@ -450,6 +451,23 @@ public class OpenFitActivity extends Activity {
                     else {
                         sendIntent(OpenFitIntent.INTENT_SERVICE_BT, OpenFitIntent.ACTION_GPS, OpenFitIntent.ACTION_FALSE);
                         oPrefs.saveBoolean("preference_checkbox_exercise_gps", false);
+                        return true;
+                    }
+                }
+            });
+
+            preference_checkbox_media_control_alternative = (CheckBoxPreference) getPreferenceManager().findPreference("preference_checkbox_media_control_alternative");
+            preference_checkbox_media_control_alternative.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    if((Boolean) newValue) {
+                        sendIntent(OpenFitIntent.INTENT_SERVICE_MEDIA, OpenFitIntent.ACTION_MEDIA_METHOD_CHANGE, OpenFitIntent.ACTION_TRUE);
+                        oPrefs.saveBoolean("preference_checkbox_media_control_alternative", true);
+                        return true;
+                    }
+                    else {
+                        sendIntent(OpenFitIntent.INTENT_SERVICE_MEDIA, OpenFitIntent.ACTION_MEDIA_METHOD_CHANGE, OpenFitIntent.ACTION_FALSE);
+                        oPrefs.saveBoolean("preference_checkbox_media_control_alternative", false);
                         return true;
                     }
                 }

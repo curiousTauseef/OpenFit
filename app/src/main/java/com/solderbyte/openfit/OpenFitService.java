@@ -840,17 +840,26 @@ public class OpenFitService extends Service {
 
     public void sendMediaPrev() {
         Log.d(LOG_TAG, "Media Prev");
-        sendBroadcast(MediaController.prevTrack(), null);
+        if (!oPrefs.preference_checkbox_media_control_alternative)
+            sendBroadcast(MediaController.prevTrack(), null);
+        else
+            MediaController.prevTrackAlternative();
     }
 
     public void sendMediaNext() {
         Log.d(LOG_TAG, "Media Next");
-        sendBroadcast(MediaController.nextTrack(), null);
+        if (!oPrefs.preference_checkbox_media_control_alternative)
+            sendBroadcast(MediaController.nextTrack(), null);
+        else
+            MediaController.nextTrackAlternative();
     }
 
     public void sendMediaPlay() {
         Log.d(LOG_TAG, "Media Play/Pause");
-        sendBroadcast(MediaController.playTrack(), null);
+        if (!oPrefs.preference_checkbox_media_control_alternative)
+            sendBroadcast(MediaController.playTrack(), null);
+        else
+            MediaController.playTrackAlternative();
     }
 
     public void sendMediaVolume(byte vol, boolean req) {
@@ -1215,9 +1224,15 @@ public class OpenFitService extends Service {
     private BroadcastReceiver mediaReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String mediaTrack = intent.getStringExtra("mediaTrack");
-            Log.d(LOG_TAG, "Media sending: " + mediaTrack);
-            sendMediaTrack();
+            final String message = intent.getStringExtra(OpenFitIntent.INTENT_EXTRA_MSG);
+            if (message == null || message.equals("")) {
+                String mediaTrack = intent.getStringExtra("mediaTrack");
+                Log.d(LOG_TAG, "Media sending: " + mediaTrack);
+                sendMediaTrack();
+            }   else if (message.equals(OpenFitIntent.ACTION_MEDIA_METHOD_CHANGE))  {
+                final String data = intent.getStringExtra(OpenFitIntent.INTENT_EXTRA_DATA);
+                oPrefs.preference_checkbox_media_control_alternative = data.equals(OpenFitIntent.ACTION_TRUE);
+            }
         }
     };
 

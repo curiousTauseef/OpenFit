@@ -51,6 +51,7 @@ public class OpenFitIntent {
     public static final String ACTION_TIME = "time";
     public static final String ACTION_WEATHER = "weather";
     public static final String ACTION_FITNESS = "fitness";
+    public static final String ACTION_MEDIA_METHOD_CHANGE = "mediaMethodChange";
 
     public static final String DEFAULT = "DEFAULT";
     public static final String NONE = "none";

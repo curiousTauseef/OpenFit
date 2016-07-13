@@ -7,7 +7,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
+import android.os.Build;
+import android.os.SystemClock;
 import android.util.Log;
+import android.view.KeyEvent;
 
 public class MediaController {
     private static final String LOG_TAG = "OpenFit:MediaController";
@@ -240,5 +243,42 @@ public class MediaController {
         }
 
         return i;
+    }
+
+    public static void prevTrackAlternative()   {
+        sendFakeMediaKeyEvent(KeyEvent.KEYCODE_MEDIA_PREVIOUS);
+    }
+
+    public static void nextTrackAlternative()   {
+        sendFakeMediaKeyEvent(KeyEvent.KEYCODE_MEDIA_NEXT);
+    }
+
+    public static void playTrackAlternative()   {
+        sendFakeMediaKeyEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE);
+    }
+
+    private static void sendFakeMediaKeyEvent(int keyCode) {
+        long eventTime = SystemClock.uptimeMillis() - 1;
+
+        KeyEvent downEvent = new KeyEvent(eventTime, eventTime, KeyEvent.ACTION_DOWN, keyCode, 0);
+        sendFakeMediaKeyEventImpl(downEvent);
+
+        eventTime++;
+        KeyEvent upEvent = new KeyEvent(eventTime, eventTime, KeyEvent.ACTION_UP, keyCode, 0);
+        sendFakeMediaKeyEventImpl(upEvent);
+    }
+
+    private static void sendFakeMediaKeyEventImpl(KeyEvent keyEvent)  {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            // use AudioManager.dispatchKeyEvent() from API 19 (KitKat)
+            // http://stackoverflow.com/questions/19890643/android-4-4-play-default-music-player
+            audioManager.dispatchMediaKeyEvent(keyEvent);
+        }   else    {
+            // use broadcasting fake intent method
+            // http://stackoverflow.com/questions/12925896/android-emulate-send-action-media-button-intent
+            Intent i = new Intent(Intent.ACTION_MEDIA_BUTTON, null);
+            i.putExtra(Intent.EXTRA_KEY_EVENT, keyEvent);
+            context.sendOrderedBroadcast(i, null);
+        }
     }
 }
